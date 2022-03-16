@@ -28,9 +28,9 @@ I have provided an example for the ESP-32 code, however you are welcome to modif
 - [x] Connection status update and display
 - [x] BT address settings
 - [x] Support for different device types
-- [ ] nearby device discovery
+- [ ] Nearby device discovery
 - [ ] RGB color selection
-- [ ] Start/Stop button for animated modes
+- [ ] Pause/play button for animated modes
 - [ ] App Icon
 
 ## Contact
