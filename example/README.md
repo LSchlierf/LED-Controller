@@ -45,7 +45,7 @@ This is the hardware pin on the ESP-32 that is connected to the 'DIN' pin of the
 #define effect_length 10
 ```
 
-This is the length of some of the light effects that I provided. Use a denominator of LED_COUNT for smoother looking animations.
+This is the length of some of the light effects that I provided. Use a divisor of LED_COUNT for smoother looking animations.
 
 ### Disclaimer: Epilepsy warning
 
