@@ -4,26 +4,25 @@
 //adjust the following values to fit your setup:
 
 //the length of your ws2812b strips in pixels:
-#define LED_COUNT 36
+#define LED_COUNT 300
 
 //the arduino pin the LEDS are connected to:
 #define led_pin 27
 
 //the length of the animated strips
-#define effect_length 6
+#define effect_length 10
 
 //adjust the above values to fit your setup
 
 /*
 commands:
-00: set mode
-01: speed up
-02: slow down
-04: set speed
+01: set mode
+02: speed up
+03: slow down
 05: set brightness
 */
-int tempo[] = {0, 20, 20, 30, 40, 50};
-int tempoincrement[] = {0, 3, 3, 3, 3, 5};
+int tempo[] = {0, 20, 20, 30, 600, 40, 50};
+int tempoincrement[] = {0, 3, 3, 3, 50, 3, 5};
 int last = LED_COUNT - 1;
 int length = effect_length - 1;
 int mode, lasttime, timepassed, pixel;
@@ -49,20 +48,16 @@ void checkbluetooth() {
   if(Bluetooth.available()){
     switch(Bluetooth.read()){
 
-      case 0: //new mode
+      case 1: //new mode
         mode = Bluetooth.read();
         break;
 
-      case 1: //speed up
+      case 2: //speed up
         tempo[mode] = max(0, (tempo[mode] - tempoincrement[mode]));
         break;
 
-      case 2: //slow down
+      case 3: //slow down
         tempo[mode] += tempoincrement[mode];
-        break;
-
-      case 4: //new speed
-        tempo[mode] = gettempo(Bluetooth.read());
         break;
 
       case 5: //brightness
@@ -76,12 +71,12 @@ void checkbluetooth() {
 void checktime() {
   timepassed = millis() - lasttime;
   if(timepassed > tempo[mode]){
-    runanimation();
+    runAnimation();
     lasttime = millis();
   }
 }
 
-void runanimation() {
+void runAnimation() {
   strip.clear();
   switch (mode) {
 
@@ -120,17 +115,35 @@ void runanimation() {
       strip.fill(colorbuf, pixel, effect_length);
       break;
 
-    case 4: //strobe light
+    case 4: //Christmas lights
+      direction = !direction;
+      for(int i = 0; i < LED_COUNT; i += effect_length){
+        if((i%(effect_length * 2) == 0) == direction){
+          for(int j = 0; j < effect_length; j++){
+            strip.setPixelColor((i + j), strip.Color(255, 0, 0));
+          }
+        }
+        else {
+          for(int j = 0; j < effect_length; j++){
+            strip.setPixelColor((i + j), strip.Color(0, 255, 0));
+          }
+        }
+      }
+      break;
+
+/* //EPILEPSY WARNING: READ DISCLAIMER IN README FIRST!
+    case 5: //strobe light
       color++;
       if(color > 23) {
         color = 0;
       }
       if((color%6 == 0) || ((color - 2)%6 == 0)) {
-        strip.fill(strip.Color(255, 255, 255));
+        strip.fill(strip.Color(127, 127, 127));
       }
       break;
+*/
 
-    case 5: //fire brigade lights
+    case 6: //fire brigade lights
       pixel++;
       if(pixel >= LED_COUNT){
         pixel = 0;
@@ -150,18 +163,7 @@ void runanimation() {
       }
 
       break;
-
-    default:
-
-      mode = 0;
-      runAnimation();
-
-      break;
       
   }
   strip.show();
-}
-
-int gettempo(int val) {
-  return val;
 }
