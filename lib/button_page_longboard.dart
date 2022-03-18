@@ -70,7 +70,7 @@ class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
               _modeChangeButton("Highlights blue", [0x00, 0x03]),
               _modeChangeButton("Bouncing rainbow strip", [0x01, 0x03]),
               _modeChangeButton("Highlights multicolor", [0x00, 0x05]),
-              _modeChangeButton("Christmas", [0x01, 0x04]),
+              _modeChangeButton("Christmas lights", [0x01, 0x04]),
               _modeChangeButton("Highlights police colors", [0x00, 0x06]),
               _modeChangeButton("Strobe light", [0x01, 0x05]),
             ],
@@ -128,25 +128,10 @@ class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
 
   void tryConnecting() {
     widget.engine.tryConnecting();
-    // updateConnection();
     setState(() {
       _connected = widget.engine.connection != null &&
           widget.engine.connection!.isConnected;
     });
-  }
-
-  void updateConnection() {
-    setState(() {
-      _connected = widget.engine.connection != null &&
-          widget.engine.connection!.isConnected;
-    });
-  }
-
-  void checkIfConnected() {
-    // setState(() {
-    _connected = widget.engine.connection != null &&
-        widget.engine.connection!.isConnected;
-    // });
   }
 
   Padding _modeChangeButton(String label, List<int> command) {

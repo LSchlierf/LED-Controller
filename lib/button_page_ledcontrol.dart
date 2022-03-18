@@ -43,18 +43,12 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
             crossAxisCount: 2,
             childAspectRatio: 3.5,
             children: [
-              _modeChangeButton("Rainbow Boulevard", [0x00, 0x04]),
-              _modeChangeButton("Bike lights", [0x00, 0x00]),
-              _modeChangeButton("Highlights red", [0x00, 0x01]),
               _modeChangeButton("Animated rainbow 1", [0x01, 0x01]),
-              _modeChangeButton("Highlights green", [0x00, 0x02]),
               _modeChangeButton("Animated rainbow 2", [0x01, 0x02]),
-              _modeChangeButton("Highlights blue", [0x00, 0x03]),
               _modeChangeButton("Bouncing rainbow strip", [0x01, 0x03]),
-              _modeChangeButton("Highlights multicolor", [0x00, 0x05]),
-              _modeChangeButton("Christmas", [0x01, 0x04]),
-              _modeChangeButton("Highlights police colors", [0x00, 0x06]),
+              _modeChangeButton("Christmas lights", [0x01, 0x04]),
               _modeChangeButton("Strobe light", [0x01, 0x05]),
+              _modeChangeButton("Fire brigade lights", [0x01, 0x06]),
             ],
           ),
           const Divider(),
@@ -110,25 +104,10 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
 
   void tryConnecting() {
     widget.engine.tryConnecting();
-    // updateConnection();
     setState(() {
       _connected = widget.engine.connection != null &&
           widget.engine.connection!.isConnected;
     });
-  }
-
-  void updateConnection() {
-    setState(() {
-      _connected = widget.engine.connection != null &&
-          widget.engine.connection!.isConnected;
-    });
-  }
-
-  void checkIfConnected() {
-    // setState(() {
-    _connected = widget.engine.connection != null &&
-        widget.engine.connection!.isConnected;
-    // });
   }
 
   Padding _modeChangeButton(String label, List<int> command) {
