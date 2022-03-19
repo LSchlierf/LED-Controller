@@ -20,7 +20,7 @@ With these you can control the mode that the light setup is displaying, as well 
 The app uses the [flutter_bluetooth_serial library by edufolly](https://github.com/edufolly/flutter_bluetooth_serial) to communicate with an ESP-32 that is driving an LED strip.  
 That may be a setup similar to [my longboard lighting project](https://github.com/LSchlierf/Glowboard-Bluetooth) or a simple ESP-32 running [this code](example/LED-controller.ino).  
 The app communicates with the ESP-32 using bluetooth serial. When sending a new command, the app sends an 8-bit integer as a command identifier plus additional integers as data values (e.g. the specific brightness to set).  
-I have provided an example for the ESP-32 code, however you are welcome to modify it or implement your own device types both for the ESP-32 as well as adding your own types to the flutter app.
+I have provided an [example](example/README.md) for the ESP-32 code, however you are welcome to modify it or implement your own device types both for the ESP-32 as well as adding your own types to the flutter app.
 
 ## Roadmap
 
