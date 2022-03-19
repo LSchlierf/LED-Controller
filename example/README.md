@@ -51,7 +51,7 @@ This is the length of some of the light effects that I provided. Use a divisor o
 
 I added a strobe light effect as an animated mode.  
 This effect might trigger seizures in individuals with photosensitive epilepsy.  
-For safety reasons, I have commented out the code that runs the animation for this mode (currently lines 134 - 144). In this state, activating this mode with the companion app will just turn the LEDs off.  
+For safety reasons, I have commented out the code that runs the animation for this mode (currently lines 150 - 160). In this state, activating this mode with the companion app will just turn the LEDs off.  
 If you are absolutely certain that you want your light setup to support the strobe light effect, you can uncomment these lines.
 
 ONLY USE THIS MODE IF YOU ARE ABSOLUTELY CERTAIN THAT NOBODY WITH PHOTOSENSITIVE EPILEPSY IS PRESENT.
