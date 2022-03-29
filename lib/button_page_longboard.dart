@@ -1,25 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:led_control/bluetooth_engine.dart';
-
-class ButtonPageLongboard extends StatelessWidget {
-  final BluetoothDevice device;
-
-  const ButtonPageLongboard({Key? key, required this.device}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-        title: "Longboard",
-        home: LongboardButtonPanel(
-          title: "Longboard",
-          engine: BluetoothEngine(device: device),
-        ),
-        theme: ThemeData.dark());
-  }
-}
 
 class LongboardButtonPanel extends StatefulWidget {
   //TODO: make portrait only
@@ -37,6 +19,12 @@ class LongboardButtonPanel extends StatefulWidget {
 class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
   bool _connected = false;
   double _brightness = 255;
+
+  @override
+  void initState() {
+    _updateConnection();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +74,7 @@ class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
               Padding(
                   padding: const EdgeInsets.all(6.0),
                   child: ElevatedButton(
-                      onPressed: _connected ? null : () => {tryConnecting()},
+                      onPressed: _connected ? null : _tryConnecting,
                       child: const Text("Connect"))),
               _modeChangeButton("Speed down", [0x03]),
             ],
@@ -126,15 +114,18 @@ class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
     );
   }
 
-  void tryConnecting() {
-    widget.engine.tryConnecting();
+  void _tryConnecting() {
+    widget.engine.tryConnecting().then((value) => _connected = value);
+  }
+
+  void _updateConnection() {
     setState(() {
       _connected = widget.engine.connection != null &&
           widget.engine.connection!.isConnected;
     });
   }
 
-  Padding _modeChangeButton(String label, List<int> command) {
+  Widget _modeChangeButton(String label, List<int> command) {
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: ElevatedButton(
@@ -142,7 +133,7 @@ class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
             ? () {
                 widget.engine
                     .sendMessage(Uint8List.fromList(command))
-                    .then((value) => {if (!value) tryConnecting()});
+                    .then((value) => {if (!value) _tryConnecting()});
               }
             : null,
         child: Text(label),

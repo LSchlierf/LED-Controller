@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -17,10 +18,10 @@ class MainPage extends StatefulWidget {
 }
 
 class MainPageState extends State<MainPage> {
-  final List<Container> _deviceTiles = List.empty(growable: true);
-  final List<String> _deviceNames = List.empty(growable: true);
-  final List<int> _deviceIndices = List.empty(growable: true);
-  int _tileID = 0;
+  final Map<int, String> _deviceNames = <int, String>{};
+  final Map<int, Widget> _deviceWidgets = <int, Widget>{};
+  final Map<int, BluetoothEngine> _deviceEngines = <int, BluetoothEngine>{};
+  int _deviceID = 0;
 
   @override
   void initState() {
@@ -42,9 +43,7 @@ class MainPageState extends State<MainPage> {
                 MaterialPageRoute(
                   builder: (context) {
                     return EditDevicePage(
-                      reloadCallback: () {
-                        _loadAllDevices();
-                      },
+                      reloadCallback: _loadAllDevices,
                     );
                   },
                 ),
@@ -57,13 +56,13 @@ class MainPageState extends State<MainPage> {
         itemCount: max(_deviceNames.length * 2 - 1, 0),
         itemBuilder: (context, index) {
           if (index.isOdd) return const Divider();
-          return _deviceTiles[index ~/ 2];
+          return _deviceWidgets.values.elementAt(index ~/ 2);
         },
       ),
     );
   }
 
-  Container _makeDeviceTile(String deviceName, int id) {
+  Container _makeDeviceWidget(String deviceName, int id) {
     return Container(
       padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
       child: GestureDetector(
@@ -102,14 +101,14 @@ class MainPageState extends State<MainPage> {
   Future<void> _loadAllDevices() async {
     List<String> deviceNames = await DeviceStorage.allDevices;
     for (String name in deviceNames) {
-      if (!_deviceNames.contains(name)) {
+      if (!_deviceNames.containsValue(name)) {
         setState(() {
           _reloadAllDevices(deviceNames);
         });
         return;
       }
     }
-    for (String name in _deviceNames) {
+    for (String name in _deviceNames.values) {
       if (!deviceNames.contains(name)) {
         setState(() {
           _reloadAllDevices(deviceNames);
@@ -120,9 +119,9 @@ class MainPageState extends State<MainPage> {
   }
 
   void _reloadAllDevices(List<String> names) {
-    _deviceIndices.clear();
+    _deviceEngines.clear();
+    _deviceWidgets.clear();
     _deviceNames.clear();
-    _deviceTiles.clear();
     for (String name in names) {
       setState(() {
         _addTile(name);
@@ -131,21 +130,30 @@ class MainPageState extends State<MainPage> {
   }
 
   void _addTile(String name) {
-    _deviceNames.add(name);
-    _deviceIndices.add(_tileID);
-    _deviceTiles.add(_makeDeviceTile(name, _tileID));
-    _tileID++;
+    _deviceNames.putIfAbsent(_deviceID, () => name);
+    _deviceWidgets.putIfAbsent(
+        _deviceID, () => _makeDeviceWidget(name, _deviceID));
+    _addEngine(name, _deviceID);
+    _deviceID++;
+  }
+
+  Future<void> _addEngine(String name, int id) async {
+    String? address = await DeviceStorage.getAddress(name);
+    BluetoothEngine engine =
+        BluetoothEngine(device: BluetoothDevice(address: address!));
+    _deviceEngines.putIfAbsent(id, () => engine);
+    engine.tryConnecting();
   }
 
   Future<void> _editDevice(int id) async {
-    String deviceName = _deviceNames.elementAt(_deviceIndices.indexOf(id));
+    String deviceName = _deviceNames[id]!;
     deviceType? type = await DeviceStorage.getDeviceType(deviceName);
     String? deviceAddres = await DeviceStorage.getAddress(deviceName);
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
           return EditDevicePage(
-            reloadCallback: () => _loadAllDevices(),
+            reloadCallback: _loadAllDevices,
             oldDeviceName: deviceName,
             oldDeviceAddress: deviceAddres!,
             oldDeviceType: type!,
@@ -156,45 +164,33 @@ class MainPageState extends State<MainPage> {
   }
 
   Future<void> _selectDevice(int id) async {
-    String deviceName = _deviceNames.elementAt(_deviceIndices.indexOf(id));
-    String? address = await DeviceStorage.getAddress(deviceName);
+    String deviceName = _deviceNames[id]!;
+    BluetoothEngine engine = _deviceEngines[id]!;
     deviceType? type = await DeviceStorage.getDeviceType(deviceName);
-    switch (type!) {
-      case deviceType.longboard:
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          switch (type!) {
+            case deviceType.longboard:
               return LongboardButtonPanel(
                 title: deviceName,
-                engine: BluetoothEngine(
-                  device: BluetoothDevice(address: address!),
-                ),
+                engine: engine,
               );
-            },
-          ),
-        );
-        break;
 
-      case deviceType.ledController:
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
+            case deviceType.ledController:
               return LedcontrolButtonPanel(
                 title: deviceName,
-                engine: BluetoothEngine(
-                  device: BluetoothDevice(address: address!),
-                ),
+                engine: engine,
               );
-            },
-          ),
-        );
-        break;
-      default:
-    }
+          }
+        },
+      ),
+    );
   }
 
   Future<void> _deletDevice(int id) async {
-    String deviceName = _deviceNames.elementAt(_deviceIndices.indexOf(id));
+    String deviceName = _deviceNames[id]!;
     return showDialog(
       context: context,
       builder: (context) {
@@ -210,7 +206,7 @@ class MainPageState extends State<MainPage> {
             TextButton(
               onPressed: () {
                 DeviceStorage.deleteDevice(deviceName)
-                    .whenComplete(() => _loadAllDevices());
+                    .whenComplete(_loadAllDevices);
                 Navigator.pop(context);
               },
               child: const Text('Delete'),

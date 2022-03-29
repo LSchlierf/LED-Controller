@@ -21,6 +21,12 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
   double _brightness = 255;
 
   @override
+  void initState() {
+    _updateConnection();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -66,7 +72,7 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
               Padding(
                   padding: const EdgeInsets.all(6.0),
                   child: ElevatedButton(
-                      onPressed: _connected ? null : () => {tryConnecting()},
+                      onPressed: _connected ? null : _tryConnecting,
                       child: const Text("Connect"))),
               _modeChangeButton("Speed down", [0x03]),
             ],
@@ -106,15 +112,18 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
     );
   }
 
-  void tryConnecting() {
-    widget.engine.tryConnecting();
+  void _tryConnecting() {
+    widget.engine.tryConnecting().then((value) => _connected = value);
+  }
+
+  void _updateConnection() {
     setState(() {
       _connected = widget.engine.connection != null &&
           widget.engine.connection!.isConnected;
     });
   }
 
-  Padding _modeChangeButton(String label, List<int> command) {
+  Widget _modeChangeButton(String label, List<int> command) {
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: ElevatedButton(
@@ -122,7 +131,7 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
             ? () {
                 widget.engine
                     .sendMessage(Uint8List.fromList(command))
-                    .then((value) => {if (!value) tryConnecting()});
+                    .then((value) => {if (!value) _tryConnecting()});
               }
             : null,
         child: Text(label),
