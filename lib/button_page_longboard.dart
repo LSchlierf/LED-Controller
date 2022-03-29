@@ -115,7 +115,11 @@ class _LongBoardButtonPanelState extends State<LongboardButtonPanel> {
   }
 
   void _tryConnecting() {
-    widget.engine.tryConnecting().then((value) => _connected = value);
+    widget.engine.tryConnecting().then((value) {
+      setState(() {
+        _connected = value;
+      });
+    });
   }
 
   void _updateConnection() {

@@ -113,7 +113,11 @@ class _LedcontrolButtonPanelState extends State<LedcontrolButtonPanel> {
   }
 
   void _tryConnecting() {
-    widget.engine.tryConnecting().then((value) => _connected = value);
+    widget.engine.tryConnecting().then((value) {
+      setState(() {
+        _connected = value;
+      });
+    });
   }
 
   void _updateConnection() {
