@@ -20,6 +20,7 @@ class LEDControlApp extends StatelessWidget {
         key: key,
         title: "LED Control",
       ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
