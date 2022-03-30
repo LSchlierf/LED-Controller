@@ -29,8 +29,7 @@ I have provided an [example](example/README.md) for the ESP-32 code, however you
 - [x] BT address settings
 - [x] Support for different device types
 - [x] Bluetooth engines as global variables for uninterrupted connection
-- [ ] Refactor control panel code into parent and child classes
-- [ ] Loading animation as connecting indication
+- [x] Loading icon as connecting indication
 - [ ] Pause/play button for animated modes
 - [ ] Nearby device discovery
 - [ ] RGB color selection
