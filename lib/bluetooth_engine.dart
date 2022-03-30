@@ -4,15 +4,26 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 class BluetoothEngine {
   final BluetoothDevice device;
   BluetoothConnection? connection;
+  connectionState _state = connectionState.disconnected;
+  Future<BluetoothConnection>? _waiting;
 
   BluetoothEngine({required this.device}) {
-    BluetoothConnection.toAddress(device.address).then((_connection) {
-      connection = _connection;
-    });
+    tryConnecting();
+  }
+
+  connectionState get state {
+    if (_state != connectionState.connecting) {
+      _state = connection != null && connection!.isConnected
+          ? connectionState.connected
+          : connectionState.disconnected;
+    }
+    return _state;
   }
 
   Future<bool> sendMessage(Uint8List data) async {
-    tryConnecting();
+    if (_state != connectionState.connected) {
+      if (!await tryConnecting()) return false;
+    }
     try {
       connection!.output.add(data);
       await connection!.output.allSent;
@@ -23,14 +34,32 @@ class BluetoothEngine {
   }
 
   Future<bool> tryConnecting() async {
-    if (connection == null || !connection!.isConnected) {
-      BluetoothConnection.toAddress(device.address).then((value) {
-        connection = value;
-        return value.isConnected;
+    if (_state == connectionState.disconnected) {
+      _state = connectionState.connecting;
+      _waiting = BluetoothConnection.toAddress(device.address).catchError((e) {
+        _waiting = null;
+        _state = connectionState.disconnected;
       });
-    } else {
+      var value = await _waiting!;
+      connection = value;
+      if (value.isConnected) {
+        _state = connectionState.connected;
+      } else {
+        _state = connectionState.disconnected;
+      }
+      _waiting = null;
+      return value.isConnected;
+    } else if (_state == connectionState.connected) {
       return true;
+    } else {
+      await _waiting;
     }
-    return false;
+    return _state == connectionState.connected;
   }
+}
+
+enum connectionState {
+  disconnected,
+  connecting,
+  connected,
 }
