@@ -4,8 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:led_control/bluetooth_engine.dart';
-import 'package:led_control/button_page_ledcontrol.dart';
-import 'package:led_control/button_page_longboard.dart';
+import 'package:led_control/button_page.dart';
 import 'package:led_control/device_storage.dart';
 import 'package:led_control/edit_device_page.dart';
 import 'package:led_control/main.dart';
@@ -142,7 +141,6 @@ class MainPageState extends State<MainPage> {
     BluetoothEngine engine =
         BluetoothEngine(device: BluetoothDevice(address: address!));
     _deviceEngines.putIfAbsent(id, () => engine);
-    engine.tryConnecting();
   }
 
   Future<void> _editDevice(int id) async {
@@ -171,19 +169,7 @@ class MainPageState extends State<MainPage> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) {
-          switch (type!) {
-            case deviceType.longboard:
-              return LongboardButtonPanel(
-                title: deviceName,
-                engine: engine,
-              );
-
-            case deviceType.ledController:
-              return LedcontrolButtonPanel(
-                title: deviceName,
-                engine: engine,
-              );
-          }
+          return ButtonPanel(title: deviceName, engine: engine, type: type!);
         },
       ),
     );
