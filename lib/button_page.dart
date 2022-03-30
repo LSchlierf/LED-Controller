@@ -36,15 +36,7 @@ class _ButtonPanelState extends State<ButtonPanel> {
         title: Text(widget.title),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.bluetooth,
-              color: _isConnected
-                  ? Colors.green
-                  : (_isDisconnected ? Colors.red : Colors.yellow),
-            ),
-            onPressed: null,
-          ),
+          makeConnectionIcon(widget.engine),
         ],
       ),
       body: ListView(
@@ -97,20 +89,16 @@ class _ButtonPanelState extends State<ButtonPanel> {
     );
   }
 
-  connectionState get _state {
-    return widget.engine.state;
-  }
-
   bool get _isConnected {
-    return _state == connectionState.connected;
+    return widget.engine.isConnected;
   }
 
   bool get _isConnecting {
-    return _state == connectionState.connecting;
+    return widget.engine.isConnecting;
   }
 
   bool get _isDisconnected {
-    return _state == connectionState.disconnected;
+    return widget.engine.isDisconnected;
   }
 
   void _tryConnecting() {
@@ -182,5 +170,21 @@ class _ButtonPanelState extends State<ButtonPanel> {
           _modeChangeButton("Warm white", [0x01, 0x0A]),
         ];
     }
+  }
+
+  static Widget makeConnectionIcon(BluetoothEngine engine) {
+    return IconButton(
+      icon: Icon(
+        engine.isConnecting
+            ? Icons.bluetooth_searching
+            : (engine.isConnected
+                ? Icons.bluetooth_connected
+                : Icons.bluetooth_disabled),
+        color: engine.isConnected
+            ? Colors.green
+            : (engine.isDisconnected ? Colors.red : Colors.yellow),
+      ),
+      onPressed: null,
+    );
   }
 }
