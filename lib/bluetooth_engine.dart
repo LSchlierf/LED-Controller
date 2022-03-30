@@ -20,6 +20,18 @@ class BluetoothEngine {
     return _state;
   }
 
+  bool get isConnected {
+    return state == connectionState.connected;
+  }
+
+  bool get isConnecting {
+    return state == connectionState.connecting;
+  }
+
+  bool get isDisconnected {
+    return state == connectionState.disconnected;
+  }
+
   Future<bool> sendMessage(Uint8List data) async {
     if (_state != connectionState.connected) {
       if (!await tryConnecting()) return false;
