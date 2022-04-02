@@ -9,7 +9,7 @@ This project uses an ESP-32 microcontroller to drive an LED strip while enabling
 - Check for Bluetooth input from the app
 - Run the animation
 
-Upon detecting Bluetooth input from the app, the ESP-32 upsdates the mode / speed / brightness, and continues running the animation.
+Upon detecting Bluetooth input from the app, the ESP-32 updates the mode / speed / brightness, and continues running the animation.
 
 ## Hardware setup
 
