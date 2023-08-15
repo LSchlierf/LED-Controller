@@ -1,7 +1,7 @@
 # Flutter LED controller app
-
+<!--
 [![wakatime](https://wakatime.com/badge/user/ee0b2e88-680b-47cf-ba7c-afd0e1637329/project/7ad04104-14cf-4a65-8aad-b4430038226b.svg)](https://wakatime.com/badge/user/ee0b2e88-680b-47cf-ba7c-afd0e1637329/project/7ad04104-14cf-4a65-8aad-b4430038226b)
-
+-->
 This is the repository for my LED-Control flutter app. It allows you to control the lighting setup of something similar to [my longboard lighting project](https://github.com/LSchlierf/Glowboard-Bluetooth).
 
 ## Showcase
